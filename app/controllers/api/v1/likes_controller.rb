@@ -11,50 +11,45 @@ class Api::V1::LikesController < ApplicationController
 
   # GET /likes/1
   def show
-    render json: like
+    render json: @like
   end
 
   # POST /likes
   def create
-    if authenticate
-      post = Post.find(params[:post_id])
-      like = Like.new(post: post, user: @user)
+    post = Post.find(params[:post_id])
+    like = Like.new(post: post, user: @user)
 
-      unless Like.where(post_id: post.id, user_id: @user.id).present?
-        if like.save
-          likes_count = post.likes_count + 1
-          post.update(likes_count: likes_count)
+    unless Like.find_by(post_id: post.id, user_id: @user.id).present?
+      if like.save
+        likes_count = post.likes_count + 1
+        post.update(likes_count: likes_count)
 
-          render json: {post: post}
-        else
-          render json: like.errors, status: :unprocessable_entity
-        end
+        render json: {post: post}
       else
-        render status: 400
+        render json: @like.errors, status: :unprocessable_entity
       end
     else
-      render status: 401
+      render status: 400
     end
   end
 
   # PATCH/PUT /likes/1
   def update
-    if like.update(like_params)
-      render json: like
-    else
-      render json: like.errors, status: :unprocessable_entity
-    end
+    # Not a valid action
   end
 
   # DELETE /likes/1
   def destroy
-    like.destroy!
+    @like.destroy!
+    post = Post.find_by(id: @like.post_id)
+    likes_count = post.likes_count - 1
+    post.update(likes_count: likes_count)
   end
 
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_like
-      like = Like.find(params[:id])
+      @like = Like.find(params[:id])
     end
 
     def method_missing(m, *args, &block)
