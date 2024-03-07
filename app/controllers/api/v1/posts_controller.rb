@@ -73,16 +73,6 @@ class Api::V1::PostsController < ApplicationController
     end
   end
 
-  def like
-    if Post.exists?(id: params[:post_id])
-      post = Post.find_by(id: params[:post_id])
-      post.increment(:likes_count)
-      render json: {data: post}, status: 200
-    else
-      render json: {error: "Post not found", error_code: 404}, status: 404
-    end
-  end
-
   private
   def post_params
     params.permit(:title, :description).with_defaults(slug: "", likes_count: 0, comments_count: 0, user: @user)
