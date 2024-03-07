@@ -18,7 +18,6 @@ class Api::V1::CommentsController < ApplicationController
   # POST /comments
   def create
     post = Post.find(params[:post_id])
-    user = User.find_by(username: request.headers[:username])
     comment = Comment.new(post: post, user: user, body: comment_params[:body])
 
     if comment.save 
@@ -33,8 +32,7 @@ class Api::V1::CommentsController < ApplicationController
 
   # PATCH/PUT /comments/1
   def update
-    user = User.find_by(username: request.headers[:username])
-    if @comment.user_id == user.id
+    if @comment.user_id == @user.id
       if @comment.update(comment_params)
         render json: @comment
       else
@@ -47,8 +45,7 @@ class Api::V1::CommentsController < ApplicationController
 
   # DELETE /comments/1
   def destroy
-    user = User.find_by(username: request.headers[:username])
-    if @comment.user_id == user.id
+    if @comment.user_id == @user.id
       @comment.destroy!
       comments_count = @post.comments_count - 1
       @post.update(comments_count: comments_count)

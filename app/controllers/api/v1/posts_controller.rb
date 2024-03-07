@@ -29,7 +29,7 @@ class Api::V1::PostsController < ApplicationController
 
   def show
     if Post.exists?(id: params[:id])
-      post = Post.find(params[:id])
+      post = Post.find_by(id: params[:id])
       render json: { data: post }, status: :ok
     else
       render json: {error: "Post not found", error_code: 404}, status: 404
@@ -38,21 +38,16 @@ class Api::V1::PostsController < ApplicationController
 
   def destroy
     if Post.exists?(id: params[:id])
-      post = Post.find(params[:id])
+      post = Post.find_by(id: params[:id])
 
-      if User.exists?(username: request.headers[:headers])
-          user = User.find_by(username: request.headers[:username])
-        if post.user_id == user.id
-          if post.destroy!
-            render json: {message: "Post deleted successfully"}, status: 204
-          else
-            render json: {message: "Post does not exist"}, status: :bad_request
-          end
+      if post.user_id == @user.id
+        if post.destroy!
+          render json: {message: "Post deleted successfully"}, status: 204
         else
-          render status: 401
+          render json: {message: "Post does not exist"}, status: :bad_request
         end
       else
-        render json: {error: "User not found", error_code: 404}, status: 404
+        render status: 401
       end
     else
       render json: {error: "Post not found", error_code: 404}, status: 404
@@ -62,21 +57,16 @@ class Api::V1::PostsController < ApplicationController
 
   def update
     if Post.exists?(id: params[:id])
-      post = Post.find(params[:id])
+      post = Post.find_by(id: params[:id])
 
-      if User.exists?(username: request.headers[:username])
-        user = User.find_by(username: request.headers[:username])
-        if post.user_id == user.id
-          if post.update!(post_params)
-            render json: {data: post}, status: 200
-          else
-            render status: :unprocessale_entity
-          end
+      if post.user_id == @user.id
+        if post.update!(post_params)
+          render json: {data: post}, status: 200
         else
-          render status: 401
+          render status: :unprocessale_entity
         end
       else
-        render json: {error: "User not found", error_code: 404}, status: 404
+        render status: 401
       end
     else
       render json: {error: "Post not found", error_code: 404}, status: 404
@@ -85,7 +75,7 @@ class Api::V1::PostsController < ApplicationController
 
   def like
     if Post.exists?(id: params[:post_id])
-      post = Post.find(params[:post_id])
+      post = Post.find_by(id: params[:post_id])
       post.increment(:likes_count)
       render json: {data: post}, status: 200
     else
@@ -95,7 +85,6 @@ class Api::V1::PostsController < ApplicationController
 
   private
   def post_params
-    user = User.find_by(username: request.headers[:username])
-    params.permit(:title, :description).with_defaults(slug: "", likes_count: 0, comments_count: 0, user: user)
+    params.permit(:title, :description).with_defaults(slug: "", likes_count: 0, comments_count: 0, user: @user)
   end
 end
