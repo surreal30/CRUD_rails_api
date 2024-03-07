@@ -6,7 +6,7 @@ module Authentication
     if user && BCrypt::Password.new(user.password) == request.headers[:password]
       return true
     else
-      return false
+      render json: {error: "Unauthorized", error_code: "401"}, status: 401
     end
   end
 
