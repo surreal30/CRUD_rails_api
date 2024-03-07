@@ -5,48 +5,59 @@ class Api::V1::UsersController < ApplicationController
 
   # GET /users
   def index
-    render json: {working: "yes"}, status: 200
-    if authenticate_user
-
-      users = User.all
-
+    users = User.all
+    if users
       render json: users
-    else
-      render status: 401
     end
   end
 
   # GET /users/1
   def show
-    render json: user
+    begin
+      user = User.find(params[:id])
+      render json: user, status: 200
+    rescue
+      render status: 404
+    end
   end
 
   # POST /users
   def create
-    unless request.headers[:username]
-      password = create_password(params[:password])
-      user = User.new(username: params[:username], password: password)
+    # unless request.headers[:username].present?
+    password = create_password(params[:password])
+    user = User.new(username: params[:username], password: password)
 
-      if user.save
-        render json: user, status: :created, location: user
-      else
-        render json: user.errors, status: :unprocessable_entity
-      end
-    end
-  end
-
-  # PATCH/PUT /users/1
-  def update
-    if user.update(user_params)
-      render json: user
+    if user.save
+      render json: user, status: :created
     else
       render json: user.errors, status: :unprocessable_entity
     end
   end
 
+  # PATCH/PUT /users/1
+  def update
+    user = User.find(params[:id])
+    if user.username == request.headers[:username]
+      password = create_password(params[:password])
+      if user.update(username: user_params[:username], password: password)
+        render json: user, status: 200
+      else
+        render json: user.errors, status: :unprocessable_entity
+      end
+    else
+      render status: 401
+    end
+  end
+
   # DELETE /users/1
   def destroy
-    user.destroy!
+    user = User.find(params[:id])
+    if user.username == request.headers[:username]
+      user.destroy!
+      render status: 204
+    else
+      render status: 401
+    end
   end
 
   def method_missing(m, *args, &block)
@@ -61,6 +72,6 @@ class Api::V1::UsersController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def user_params
-      params.require(:user).permit(:username, :password)
+      params.permit(:username, :password)
     end
 end
