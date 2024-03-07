@@ -19,17 +19,13 @@ class Api::V1::LikesController < ApplicationController
     post = Post.find(params[:post_id])
     like = Like.new(post: post, user: @user)
 
-    unless Like.find_by(post_id: post.id, user_id: @user.id).present?
-      if like.save
-        likes_count = post.likes_count + 1
-        post.update(likes_count: likes_count)
+    if like.save
+      likes_count = post.likes_count + 1
+      post.update(likes_count: likes_count)
 
-        render json: {post: post}, status: 201
-      else
-        render json: @like.errors, status: :unprocessable_entity
-      end
+      render json: {post: post}, status: 201
     else
-      render status: 400
+      render json: like.errors, status: :unprocessable_entity
     end
   end
 
