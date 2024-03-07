@@ -18,10 +18,9 @@ class Api::V1::LikesController < ApplicationController
   def create
     if authenticate
       post = Post.find(params[:post_id])
-      user = User.find_by(username: request.headers[:username])
-      like = Like.new(post: post, user: user)
+      like = Like.new(post: post, user: @user)
 
-      unless Like.where(post_id: post.id, user_id: user.id).present?
+      unless Like.where(post_id: post.id, user_id: @user.id).present?
         if like.save
           likes_count = post.likes_count + 1
           post.update(likes_count: likes_count)
