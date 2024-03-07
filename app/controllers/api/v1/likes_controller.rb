@@ -24,7 +24,7 @@ class Api::V1::LikesController < ApplicationController
         likes_count = post.likes_count + 1
         post.update(likes_count: likes_count)
 
-        render json: {post: post}
+        render json: {post: post}, status: 201
       else
         render json: @like.errors, status: :unprocessable_entity
       end
@@ -40,10 +40,11 @@ class Api::V1::LikesController < ApplicationController
 
   # DELETE /likes/1
   def destroy
-    @like.destroy!
     post = Post.find_by(id: @like.post_id)
+    @like.destroy!
     likes_count = post.likes_count - 1
     post.update(likes_count: likes_count)
+    render json: post, status: 200
   end
 
   private
