@@ -23,40 +23,51 @@ class Api::V1::UsersController < ApplicationController
 
   # POST /users
   def create
-    # unless request.headers[:username].present?
-    password = create_password(params[:password])
-    user = User.new(username: params[:username], password: password)
+    unless request.headers[:username].present?
+      password = create_password(params[:password])
+      user = User.new(username: params[:username], password: password)
 
-    if user.save
-      render json: user, status: :created
+      if user.save
+        render json: user, status: :created
+      else
+        render json: user.errors, status: :unprocessable_entity
+      end
     else
-      render json: user.errors, status: :unprocessable_entity
+      render status: 400
     end
   end
 
   # PATCH/PUT /users/1
   def update
-    user = User.find(params[:id])
-    if user.username == request.headers[:username]
-      password = create_password(params[:password])
-      if user.update(username: user_params[:username], password: password)
-        render json: user, status: 200
+    begin
+      user = User.find(params[:id])
+      if user.username == request.headers[:username]
+        password = create_password(params[:password])
+        if user.update(username: user_params[:username], password: password)
+          render json: user, status: 200
+        else
+          render json: user.errors, status: :unprocessable_entity
+        end
       else
-        render json: user.errors, status: :unprocessable_entity
+        render status: 401
       end
-    else
-      render status: 401
+    rescue
+      render status: 404
     end
   end
 
   # DELETE /users/1
   def destroy
-    user = User.find(params[:id])
-    if user.username == request.headers[:username]
-      user.destroy!
-      render status: 204
-    else
-      render status: 401
+    begin
+      user = User.find(params[:id])
+      if user.username == request.headers[:username]
+        user.destroy!
+        render status: 204
+      else
+        render status: 401
+      end
+    rescue
+      render status: 404
     end
   end
 
