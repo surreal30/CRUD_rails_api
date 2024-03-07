@@ -13,11 +13,11 @@ class Api::V1::PostsController < ApplicationController
 
   def create
     if authenticate
-      user = User.find_by(username: request.headers[:username])
-      post = Post.new(title: post_params[:title], description: post_params[:description], slug: "", comments_count: 0, likes_count: 0, user: user)
+      post = Post.new(post_params)
 
+      # render json: {params: post_params, post: post}
       if post.save
-        post.update(slug: "api/v1/posts/" << String(post.id))
+        post.update(slug: "api/v1/posts/#{post.id}")
         render json: {data: post}, status: 201
       else
         render json: post.errors, status: :unprocessale_entity
@@ -90,6 +90,7 @@ class Api::V1::PostsController < ApplicationController
 
   private
   def post_params
-    params.permit(:title, :description)
+    user = User.find_by(username: request.headers[:username])
+    params.permit(:title, :description).with_defaults(slug: "", likes_count: 0, comments_count: 0, user: user)
   end
 end
