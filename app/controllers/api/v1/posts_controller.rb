@@ -23,7 +23,7 @@ class Api::V1::PostsController < ApplicationController
       post.update(slug: "api/v1/posts/#{post.id}")
       render json: post, status: 201
     else
-      render json: post.errors, status: :unprocessable_entity
+      render json: post.errors, status: 422
     end
   end
 
@@ -63,7 +63,7 @@ class Api::V1::PostsController < ApplicationController
         if post.update!(post_params)
           render json: post, status: 200
         else
-          render status: :unprocessale_entity
+          render status: 422
         end
       else
         render status: 401
