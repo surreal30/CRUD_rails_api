@@ -7,7 +7,7 @@ class Api::V1::PostsController < ApplicationController
       posts = Post.all
 
       if posts
-        render json: {data: posts}, status: :ok
+        render json: posts, status: :ok
       else
         render json: posts.errors, status: :bad_request
       end
@@ -21,16 +21,16 @@ class Api::V1::PostsController < ApplicationController
 
     if post.save
       post.update(slug: "api/v1/posts/#{post.id}")
-      render json: {data: post}, status: 201
+      render json: post, status: 201
     else
-      render json: post.errors, status: :unprocessale_entity
+      render json: post.errors, status: :unprocessable_entity
     end
   end
 
   def show
     if Post.exists?(id: params[:id])
       post = Post.find_by(id: params[:id])
-      render json: { data: post }, status: :ok
+      render json: post, status: :ok
     else
       render json: {error: "Post not found", error_code: 404}, status: 404
     end
@@ -61,7 +61,7 @@ class Api::V1::PostsController < ApplicationController
 
       if post.user_id == @user.id
         if post.update!(post_params)
-          render json: {data: post}, status: 200
+          render json: post, status: 200
         else
           render status: :unprocessale_entity
         end

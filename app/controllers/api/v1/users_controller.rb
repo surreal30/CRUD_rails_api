@@ -6,7 +6,7 @@ class Api::V1::UsersController < ApplicationController
   def index
     users = User.all
     if users
-      render json: users
+      render json: users, status: 200
     end
   end
 
@@ -22,7 +22,7 @@ class Api::V1::UsersController < ApplicationController
       user = User.new(username: params[:username], password: password)
 
       if user.save
-        render json: user, status: :created
+        render json: user, status: 201
       else
         render json: user.errors, status: :unprocessable_entity
       end

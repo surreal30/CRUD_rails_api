@@ -1,4 +1,5 @@
 class ApplicationController < ActionController::API
+  # include ActionController::Serialization
   before_action :get_user
 
   def get_user
