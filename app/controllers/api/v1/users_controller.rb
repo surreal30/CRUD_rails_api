@@ -1,6 +1,6 @@
 class Api::V1::UsersController < ApplicationController
   include Authentication
-
+  skip_before_action :get_user, only: [:create]
 
   # GET /users
   def index
@@ -12,7 +12,12 @@ class Api::V1::UsersController < ApplicationController
 
   # GET /users/1
   def show
-      render json: @user, status: 200
+    if User.exists?(id: params[:id])
+      user = User.find_by(id: params[:id])
+      render json: user, status: 200
+    else
+      render json: {error: "No user found", error_code: 404}, status: 404
+    end
   end
 
   # POST /users
@@ -35,8 +40,8 @@ class Api::V1::UsersController < ApplicationController
   def update
     if @user.username == request.headers[:username]
       password = create_password(params[:password])
-      if @user.update(username: user_params[:username], password: password)
-        render json: user, status: 200
+      if @user.update!(user_params)
+        render json: @user, status: 201
       else
         render json: @user.errors, status: :unprocessable_entity
       end
