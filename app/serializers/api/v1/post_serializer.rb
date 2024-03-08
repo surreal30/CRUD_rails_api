@@ -1,4 +1,6 @@
-class PostSerializer < ActiveModel::Serializer
+class Api::V1::PostSerializer < ActiveModel::Serializer
+  belongs_to :user
+
   has_many :comments do
     @object.comments.limit(5)
   end
@@ -6,5 +8,5 @@ class PostSerializer < ActiveModel::Serializer
     @object.likes.limit(5)
   end
 
-  attributes :id, :title, :description, :slug, :likes_count, :comments_count, :user_id, :comments, :likes
+  attributes :id, :title, :description, :slug, :likes_count, :comments_count, :comments, :likes
 end
