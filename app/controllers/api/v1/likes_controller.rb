@@ -4,7 +4,7 @@ class Api::V1::LikesController < ApplicationController
 
   # GET /likes
   def index
-    likes = Like.all
+    likes = Like.find_by(post_id: params[:post_id])
 
     render json: likes
   end
