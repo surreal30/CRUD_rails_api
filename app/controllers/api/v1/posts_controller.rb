@@ -1,5 +1,6 @@
 class Api::V1::PostsController < ApplicationController
   include Authentication
+  include Authorization
   before_action :authenticate
 
   def index
@@ -35,7 +36,7 @@ class Api::V1::PostsController < ApplicationController
   def destroy
     post = Post.find_by(id: params[:id])
     if post
-      if post.user_id == @user.id
+      if authorized?(post)
         if post.destroy!
           render json: {message: "Post deleted successfully"}, status: 204
         else
@@ -53,7 +54,7 @@ class Api::V1::PostsController < ApplicationController
   def update
     post = Post.find_by(id: params[:id])
     if post
-      if post.user_id == @user.id
+      if authorized?(post)
         if post.update!(post_params)
           render json: post, status: 200
         else

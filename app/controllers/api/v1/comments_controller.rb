@@ -1,6 +1,7 @@
 class Api::V1::CommentsController < ApplicationController
   before_action :set_comment, only: %i[ show update destroy ]
   include Authentication
+  include Authorization
   before_action :authenticate
 
   # GET /comments
@@ -28,7 +29,7 @@ class Api::V1::CommentsController < ApplicationController
 
   # PATCH/PUT /comments/1
   def update
-    if @comment.user_id == @user.id
+    if authorized?(@comment)
       if @comment.update(comment_params)
         render json: @comment
       else
@@ -41,7 +42,7 @@ class Api::V1::CommentsController < ApplicationController
 
   # DELETE /comments/1
   def destroy
-    if @comment.user_id == @user.id
+    if authorized?(@comment)
       @comment.destroy!
     else
       render json: {error_message: "Unauthorized user", error_code: 401}, status: 401
