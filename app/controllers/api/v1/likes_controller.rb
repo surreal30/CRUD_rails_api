@@ -19,9 +19,6 @@ class Api::V1::LikesController < ApplicationController
     like = Post.find(params[:post_id]).likes.new(user: @user)
 
     if like.save
-      # likes_count = post.likes_count + 1
-      # post.update(likes_count: likes_count)
-
       render json: {post: post}, status: 201
     else
       render json: like.errors, status: :unprocessable_entity
@@ -37,8 +34,6 @@ class Api::V1::LikesController < ApplicationController
   def destroy
     post = Post.find_by(id: @like.post_id)
     @like.destroy!
-    # likes_count = post.likes_count - 1
-    # post.update(likes_count: likes_count)
     render json: post, status: 200
   end
 
