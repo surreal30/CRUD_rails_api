@@ -17,8 +17,7 @@ class Api::V1::CommentsController < ApplicationController
 
   # POST /comments
   def create
-    post = Post.find(params[:post_id])
-    comment = Comment.new(post: post, user: @user, body: comment_params[:body])
+    comment = Post.find(params[:post_id]).comments.new(user: @user, body: comment_params[:body])
 
     if comment.save 
       render json: {data: comment}, status: 200

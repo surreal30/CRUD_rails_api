@@ -16,8 +16,7 @@ class Api::V1::LikesController < ApplicationController
 
   # POST /likes
   def create
-    post = Post.find(params[:post_id])
-    like = Like.new(post: post, user: @user)
+    like = Post.find(params[:post_id]).likes.new(user: @user)
 
     if like.save
       # likes_count = post.likes_count + 1
