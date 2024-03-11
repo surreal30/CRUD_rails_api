@@ -21,9 +21,6 @@ class Api::V1::CommentsController < ApplicationController
     comment = Comment.new(post: post, user: @user, body: comment_params[:body])
 
     if comment.save 
-      comments_count = post.comments_count + 1
-      post.update(comments_count: comments_count)
-
       render json: {data: comment}, status: 200
     else
       render status: :unprocessable_entity
@@ -47,8 +44,6 @@ class Api::V1::CommentsController < ApplicationController
   def destroy
     if @comment.user_id == @user.id
       @comment.destroy!
-      comments_count = @post.comments_count - 1
-      @post.update(comments_count: comments_count)
     else
       render status: 401
     end

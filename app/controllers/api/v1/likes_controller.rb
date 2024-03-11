@@ -20,8 +20,8 @@ class Api::V1::LikesController < ApplicationController
     like = Like.new(post: post, user: @user)
 
     if like.save
-      likes_count = post.likes_count + 1
-      post.update(likes_count: likes_count)
+      # likes_count = post.likes_count + 1
+      # post.update(likes_count: likes_count)
 
       render json: {post: post}, status: 201
     else
@@ -38,8 +38,8 @@ class Api::V1::LikesController < ApplicationController
   def destroy
     post = Post.find_by(id: @like.post_id)
     @like.destroy!
-    likes_count = post.likes_count - 1
-    post.update(likes_count: likes_count)
+    # likes_count = post.likes_count - 1
+    # post.update(likes_count: likes_count)
     render json: post, status: 200
   end
 
